@@ -1,0 +1,19 @@
+{
+  "uuid": "a2e42f12-4e53-4185-a082-d6bb1faae2fa",
+  "shortName": "workshop",
+  "longName": "workshop",
+  "companyName": "MakeAwesomeHappen",
+  "versionLabel": "1.0",
+  "sdkVersion": "3",
+  "targetPlatforms": ["aplite", "basalt", "chalk"],
+  "enableMultiJS": true,
+  "watchapp": {
+    "watchface": true
+  },
+  "appKeys": {
+    "dummy": 0
+  },
+  "resources": {
+    "media": []
+  }
+}
