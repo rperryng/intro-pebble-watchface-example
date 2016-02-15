@@ -2,6 +2,7 @@
 
 static Window *s_main_window;
 static TextLayer *s_time_layer;
+static TextLayer *s_step_layer;
 
 static void update_time() {
   time_t temp = time(NULL);
@@ -22,18 +23,26 @@ static void main_window_load(Window *window) {
   GRect bounds = layer_get_bounds(window_layer);
 
   s_time_layer = text_layer_create(GRect(0, 58, bounds.size.w, 50));
-
   text_layer_set_background_color(s_time_layer, GColorClear);
   text_layer_set_text_color(s_time_layer, GColorJazzberryJam);
   text_layer_set_font(s_time_layer, fonts_get_system_font(FONT_KEY_BITHAM_42_BOLD));
   text_layer_set_text_alignment(s_time_layer, GTextAlignmentCenter);
   text_layer_set_text(s_time_layer, "00:00");
 
+  s_step_layer = text_layer_create(GRect(20, 38, bounds.size.w, 30));
+  text_layer_set_background_color(s_step_layer, GColorClear);
+  text_layer_set_text_color(s_step_layer, GColorBlack);
+  text_layer_set_font(s_step_layer, fonts_get_system_font(FONT_KEY_GOTHIC_28));
+  text_layer_set_text_alignment(s_step_layer, GTextAlignmentLeft);
+  text_layer_set_text(s_step_layer, "steps  ");
+
   layer_add_child(window_layer, text_layer_get_layer(s_time_layer));
+  layer_add_child(window_layer, text_layer_get_layer(s_step_layer));
 }
 
 static void main_window_unload(Window *window) {
   text_layer_destroy(s_time_layer);
+  text_layer_destroy(s_step_layer);
 }
 
 static void init() {
