@@ -4,6 +4,43 @@ static Window *s_main_window;
 static TextLayer *s_time_layer;
 static TextLayer *s_step_layer;
 
+#if defined(PBL_HEALTH)
+static void update_steps() {
+  HealthMetric metric = HealthMetricStepCount;
+
+  time_t start = time_start_of_today();
+  time_t end = time(NULL);
+
+  HealthServiceAccessibilityMask mask = health_service_metric_accessible(metric, start, end);
+
+  if (mask & HealthServiceAccessibilityMaskAvailable) {
+    static char steps_text[sizeof("steps: 99999")];
+    snprintf(steps_text, sizeof(steps_text), "steps %d", (int) health_service_sum_today(metric));
+    text_layer_set_text(s_step_layer, steps_text);
+  } else {
+    APP_LOG(APP_LOG_LEVEL_ERROR, "Data unavailable!");
+  }
+}
+#endif
+
+#if defined(PBL_HEALTH)
+static void health_handler(HealthEventType event, void *context) {
+  switch (event) {
+    case HealthEventSignificantUpdate:
+      // No implementation
+      break;
+
+    case HealthEventMovementUpdate:
+      update_steps();
+      break;
+
+    case HealthEventSleepUpdate:
+      // No implementatio
+      break;
+  }
+}
+#endif
+
 static void update_time() {
   time_t temp = time(NULL);
   struct tm *tick_time = localtime(&temp);
@@ -16,6 +53,10 @@ static void update_time() {
 
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
   update_time();
+
+#if defined(PBL_HEALTH)
+  update_steps();
+#endif
 }
 
 static void main_window_load(Window *window) {
@@ -54,6 +95,15 @@ static void init() {
   });
 
   tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
+
+#if defined(PBL_HEALTH)
+  if (!health_service_events_subscribe(health_handler, NULL)) {
+    APP_LOG(APP_LOG_LEVEL_ERROR, "Health not available!");
+  }
+
+#else
+  APP_LOG(APP_LOG_LEVEL_ERROR, "Health not available!");
+#endif
 
   window_stack_push(s_main_window, true);
 }
